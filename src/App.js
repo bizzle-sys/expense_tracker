@@ -1,11 +1,15 @@
 import { Button } from 'react-bootstrap';
 import './App.css';
+import Dashboard from './pages/dashboard/Dashboard';
+import Login from './pages/login/Login';
+import Register from './pages/register/Register';
 
 function App() {
   return (
-    <div className="">
-      <Button>asddsad
-        <i class="fa-brands fa-react"></i>      </Button>
+    <div className="wrapper">
+      <Login />
+      <Register />
+      <Dashboard />
     </div>
   );
 }

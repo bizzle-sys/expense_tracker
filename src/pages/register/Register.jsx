@@ -3,9 +3,13 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { CustomInput } from '../../components/CustomInput';
 import { ToastContainer, toast } from 'react-toastify';
-import {createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from '../../firebase/Firebase-config';
+import {createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { auth, db } from '../../firebase/Firebase-config';
 import { Spinner } from 'react-bootstrap';
+import { doc, setDoc } from "firebase/firestore"; 
+import { useNavigate } from 'react-router-dom';
+
+
 const inputfield = [{
     label: "first name", name: "fName" , placeholder: "sam", required: true
 },
@@ -26,6 +30,7 @@ const inputfield = [{
 
 function Register() {
     // local states
+    const navigate = useNavigate()
     const [fromDt, setFrmDt] = useState ({})
     const [error, setError] = useState ("")
     const [isLoading, setIsLoading] = useState(false)
@@ -57,25 +62,43 @@ const handleOnSubmit = e =>{
     if (confirmpassword !== password) {
     return toast.error("passwrod do not match")
     } 
-    toast.success("good job")
 
     setIsLoading(true)
     
     
     
     createUserWithEmailAndPassword(auth, email, password)
-  .then((userCredential) => {
+  .then(async(userCredential) => {
     // Signed in 
-    console.log(userCredential)
-    // const user = userCredential.user;
+    const user = userCredential.user;
     setIsLoading(false)
+
+    updateProfile(user, {displayName: fromDt.fName})
+
+    await setDoc(doc(db, "users", user.uid), {
+        fName: fromDt.fName,
+       lName: fromDt.lName,
+        email: fromDt.email,
+      });
+      toast.success("good job")
+      
+      navigate('/dashboard')
+    
     // ...
   })
   .catch((error) => {
+    setIsLoading(false)
+    let message 
+    if (error.message.includes('auth/email-already-in-use')) {
+        message = "user exists"
+    }
+    toast.error(message)
     // const errorCode = error.code;
     // const errorMessage = error.message;
     // ..
-  });
+  })
+
+  setFrmDt({})
         
     
     
@@ -105,11 +128,7 @@ const handleOnSubmit = e =>{
                 </Form.Text>
                </div>
     
-        
-   
-
-  
-    <Button variant="primary" type="submit" disabled= {error}>
+        <Button variant="primary" type="submit" disabled= {error}>
         {isLoading ? <Spinner animation='border'/> : "Submit"}
     </Button>
   </Form>

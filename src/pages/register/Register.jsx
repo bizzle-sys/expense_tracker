@@ -80,7 +80,7 @@ const handleOnSubmit = e =>{
        lName: fromDt.lName,
         email: fromDt.email,
       });
-      toast.success("good job")
+       toast.success("good job")
       
       navigate('/dashboard')
     

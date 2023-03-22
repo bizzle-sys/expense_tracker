@@ -8,7 +8,8 @@ import { auth, db } from '../../firebase/Firebase-config';
 import { Spinner } from 'react-bootstrap';
 import { doc, setDoc } from "firebase/firestore"; 
 import { useNavigate } from 'react-router-dom';
-
+import { useDispatch } from 'react-redux'; 
+import { setUser } from '../register-login/userSlice';
 
 const inputfield = [{
     label: "first name", name: "fName" , placeholder: "sam", required: true
@@ -29,6 +30,7 @@ const inputfield = [{
 ]
 
 function Register() {
+    const dispatch = useDispatch()
     // local states
     const navigate = useNavigate()
     const [fromDt, setFrmDt] = useState ({})
@@ -82,6 +84,9 @@ const handleOnSubmit = e =>{
       });
        toast.success("good job")
       
+    //    set data to redux store
+      dispatch(setUser(user))
+
       navigate('/dashboard')
     
     // ...
